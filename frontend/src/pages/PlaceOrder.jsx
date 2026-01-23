@@ -32,25 +32,39 @@ const PlaceOrder = () => {
     }
 
     const initPay = (order) => {
+        console.log('Initializing Razorpay payment with order:', order);
+        
         const options = {
             key: import.meta.env.VITE_RAZORPAY_KEY_ID,
             amount: order.amount,
             currency: order.currency,
-            name:'Order Payment',
-            description:'Order Payment',
-            order_id: order._id,
-            receipt: order.receipt,
+            name: 'Order Payment',
+            description: 'Order Payment',
+            order_id: order.id, // Use order.id (Razorpay order ID), not order._id
             handler: async (response) => {
-                console.log(response)
+                console.log('Razorpay Payment Response:', response)
                 try {
-                    const { data } = await axios.post(backendUrl + '/api/order/verifyRazorpay', response, {headers: {token}})
+                    // Prepare verification data with all required Razorpay response fields
+                    // Note: userId is automatically extracted from token by auth middleware
+                    const verificationData = {
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature
+                    }
+                    
+                    console.log('Sending verification data to backend:', verificationData);
+                    
+                    const { data } = await axios.post(backendUrl + '/api/order/verifyRazorpay', verificationData, {headers: {token}})
                     if (data.success) {
                         navigate('/orders');
                         setCartItems({});
+                        toast.success(data.message || 'Payment successful!');
+                    } else {
+                        toast.error(data.message || 'Payment verification failed');
                     }
                 } catch (error) {
                     console.log(error);
-                    toast.error(error.message);
+                    toast.error(error.response?.data?.message || error.message || 'Payment verification failed');
                 }
             }
         }
