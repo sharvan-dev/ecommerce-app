@@ -33,9 +33,15 @@ const PlaceOrder = () => {
 
     const initPay = (order) => {
         console.log('Initializing Razorpay payment with order:', order);
+
+        const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID?.toString().trim().replace(/^['"]|['"]$/g, '')
+        if (!razorpayKey) {
+            toast.error('Razorpay public key is missing. Please set VITE_RAZORPAY_KEY_ID in frontend/.env.')
+            return
+        }
         
         const options = {
-            key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+            key: razorpayKey,
             amount: order.amount,
             currency: order.currency,
             name: 'Order Payment',
@@ -54,7 +60,7 @@ const PlaceOrder = () => {
                     
                     console.log('Sending verification data to backend:', verificationData);
                     
-                    const { data } = await axios.post(backendUrl + '/api/order/verifyRazorpay', verificationData, {headers: {token}})
+                    const { data } = await axios.post(backendUrl + '/api/order/verifyRazorpay', verificationData, { headers: { token, Authorization: `Bearer ${token}` } })
                     if (data.success) {
                         navigate('/orders');
                         setCartItems({});
@@ -101,7 +107,7 @@ const PlaceOrder = () => {
 
                 // API call for COD
                 case 'cod':
-                    const response = await axios.post(backendUrl + '/api/order/place',orderData,{headers: {token}})
+                    const response = await axios.post(backendUrl + '/api/order/place',orderData,{ headers: { token, Authorization: `Bearer ${token}` } })
                     
                     if (response.data.success) {
                         setCartItems({})
@@ -112,7 +118,7 @@ const PlaceOrder = () => {
                     break;
 
                     case 'stripe':
-                        const responseStripe = await axios.post(backendUrl + '/api/order/stripe', orderData, { headers: {token}})
+                        const responseStripe = await axios.post(backendUrl + '/api/order/stripe', orderData, { headers: { token, Authorization: `Bearer ${token}` } })
                         if (responseStripe.data.success) {
                             const {session_url } = responseStripe.data
                             window.location.replace(session_url)
@@ -123,10 +129,11 @@ const PlaceOrder = () => {
 
                     case 'razorpay':
 
-                        const responseRazorpay = await axios.post(backendUrl + '/api/order/razorpay', orderData, { headers: {token}})
+                        const responseRazorpay = await axios.post(backendUrl + '/api/order/razorpay', orderData, { headers: { token, Authorization: `Bearer ${token}` } })
                         if (responseRazorpay.data.success) {
                             initPay(responseRazorpay.data.order)
-                            
+                        } else {
+                            toast.error(responseRazorpay.data.message || 'Razorpay order creation failed')
                         }
 
                     break;

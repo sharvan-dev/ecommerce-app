@@ -8,13 +8,22 @@ import crypto from 'crypto'
 const currency = 'inr'
 const deliveryCharge = 10
 
+const sanitizeEnvValue = (value) => (typeof value === 'string' ? value.trim().replace(/^['"]|['"]$/g, '') : '')
+
+const getRazorpayConfig = () => ({
+    keyId: sanitizeEnvValue(process.env.RAZORPAY_KEY_ID),
+    keySecret: sanitizeEnvValue(process.env.RAZORPAY_KEY_SECRET)
+})
+
 // gateway initialize
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-const razorpayInstance = new razorpay({
-    key_id : process.env.RAZORPAY_KEY_ID,
-    key_secret : process.env.RAZORPAY_KEY_SECRET,
-})
+const buildRazorpayInstance = () => {
+    const { keyId, keySecret } = getRazorpayConfig()
+    return new razorpay({ key_id: keyId, key_secret: keySecret })
+}
+
+const razorpayInstance = buildRazorpayInstance()
 
 // Placing orders using COD Method
 const placeOrder = async (req, res) => {
@@ -154,6 +163,12 @@ const placeOrderRazopay = async (req, res) => {
         await newOrder.save()
         console.log('MongoDB Order created with ID:', newOrder._id.toString());
 
+        const { keyId, keySecret } = getRazorpayConfig()
+        if (!keyId || !keySecret || keyId.includes('your_') || keySecret.includes('your_')) {
+            await orderModel.findByIdAndDelete(newOrder._id)
+            return res.status(500).json({ success: false, message: 'Razorpay API credentials are not configured properly. Please set valid Razorpay test keys in backend/.env.' })
+        }
+
         const options = {
             amount: amount * 100, // Convert to paise
             currency: currency.toUpperCase(),
@@ -162,16 +177,19 @@ const placeOrderRazopay = async (req, res) => {
 
         console.log('Razorpay Order Options:', options);
 
-        // Use promise-based approach instead of callback for better error handling
         try {
             const order = await razorpayInstance.orders.create(options);
             console.log('Razorpay Order Created Successfully:', order);
-            res.json({ success: true, order});
+            return res.json({ success: true, order });
         } catch (razorpayError) {
             console.log('Razorpay Order Creation Error:', razorpayError);
-            // Delete the MongoDB order if Razorpay order creation fails
             await orderModel.findByIdAndDelete(newOrder._id);
-            return res.json({ success: false, message: razorpayError.error?.description || razorpayError.message || 'Razorpay order creation failed'});
+
+            const message = razorpayError?.statusCode === 401 || razorpayError?.error?.code === 'BAD_REQUEST_ERROR'
+                ? 'Razorpay authentication failed. Please verify the Razorpay API key ID and secret in backend/.env.'
+                : razorpayError?.error?.description || razorpayError?.message || 'Razorpay order creation failed';
+
+            return res.status(401).json({ success: false, message });
         }
 
     } catch (error) {
