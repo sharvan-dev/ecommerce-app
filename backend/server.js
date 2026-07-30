@@ -8,26 +8,31 @@ import productRouter from './routes/productRoute.js'
 import cartRouter from './routes/cartRoute.js'
 import orderRouter from './routes/orderRoute.js'
 
-// App Config
 const app = express()
 const port = process.env.PORT || 4000
+
 connectDB()
 connectCloudinary()
 
-// middlewares
 app.use(express.json())
 app.use(cors())
 
-// api endpoints
-app.use('/api/user',userRouter)
-app.use('/api/product',productRouter)
-app.use('/api/cart',cartRouter)
-app.use('/api/order',orderRouter)
+app.use('/api/user', userRouter)
+app.use('/api/product', productRouter)
+app.use('/api/cart', cartRouter)
+app.use('/api/order', orderRouter)
 
-app.get('/',(req,res)=>{
-    res.send("API Working")
+app.get('/', (req, res) => {
+    res.status(200).send('API Working')
 })
 
-export default app
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' })
+})
 
-app.listen(port, ()=> console.log('Server started PORT : '+ port))
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+    app.listen(port, () => console.log('Server started PORT : ' + port))
+}
+
+export default app
+export const handler = app
