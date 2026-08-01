@@ -10,7 +10,7 @@ import orderRouter from './routes/orderRoute.js'
 
 
 const app = express()
-const port = process.env.PORT || 4000
+const initialPort = Number(process.env.PORT || 4000)
 
 connectDB()
 connectCloudinary()
@@ -31,8 +31,26 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok' })
 })
 
+const startServer = (port = initialPort) => {
+    const server = app.listen(port, () => {
+        console.log('Server started PORT : ' + port)
+    })
+
+    server.on('error', (error) => {
+        if (error.code === 'EADDRINUSE') {
+            const nextPort = port + 1
+            console.warn(`Port ${port} is busy, trying ${nextPort}...`)
+            startServer(nextPort)
+            server.close()
+        } else {
+            console.error(error)
+            process.exit(1)
+        }
+    })
+}
+
 if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
-    app.listen(port, () => console.log('Server started PORT : ' + port))
+    startServer()
 }
 
 export default app

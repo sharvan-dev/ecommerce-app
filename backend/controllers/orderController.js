@@ -15,15 +15,38 @@ const getRazorpayConfig = () => ({
     keySecret: sanitizeEnvValue(process.env.RAZORPAY_KEY_SECRET)
 })
 
-// gateway initialize
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+// Gateway initialization is deferred so the server can boot even when payment
+// credentials are not configured yet.
+let stripeInstance = null
+let razorpayInstance = null
 
-const buildRazorpayInstance = () => {
-    const { keyId, keySecret } = getRazorpayConfig()
-    return new razorpay({ key_id: keyId, key_secret: keySecret })
+const getStripeInstance = () => {
+    const secretKey = sanitizeEnvValue(process.env.STRIPE_SECRET_KEY)
+
+    if (!secretKey) {
+        throw new Error('Stripe secret key is not configured')
+    }
+
+    if (!stripeInstance) {
+        stripeInstance = new Stripe(secretKey)
+    }
+
+    return stripeInstance
 }
 
-const razorpayInstance = buildRazorpayInstance()
+const getRazorpayInstance = () => {
+    const { keyId, keySecret } = getRazorpayConfig()
+
+    if (!keyId || !keySecret || keyId.includes('your_') || keySecret.includes('your_')) {
+        throw new Error('Razorpay API credentials are not configured properly')
+    }
+
+    if (!razorpayInstance) {
+        razorpayInstance = new razorpay({ key_id: keyId, key_secret: keySecret })
+    }
+
+    return razorpayInstance
+}
 
 // Placing orders using COD Method
 const placeOrder = async (req, res) => {
@@ -100,6 +123,8 @@ const placeOrderStripe = async (req, res) => {
            quantity: 1
         })
 
+        const stripe = getStripeInstance()
+
         const session = await stripe.checkout.sessions.create({
             success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
             cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
@@ -163,8 +188,11 @@ const placeOrderRazopay = async (req, res) => {
         await newOrder.save()
         console.log('MongoDB Order created with ID:', newOrder._id.toString());
 
-        const { keyId, keySecret } = getRazorpayConfig()
-        if (!keyId || !keySecret || keyId.includes('your_') || keySecret.includes('your_')) {
+        let razorpayClient
+
+        try {
+            razorpayClient = getRazorpayInstance()
+        } catch (error) {
             await orderModel.findByIdAndDelete(newOrder._id)
             return res.status(500).json({ success: false, message: 'Razorpay API credentials are not configured properly. Please set valid Razorpay test keys in backend/.env.' })
         }
@@ -178,7 +206,7 @@ const placeOrderRazopay = async (req, res) => {
         console.log('Razorpay Order Options:', options);
 
         try {
-            const order = await razorpayInstance.orders.create(options);
+            const order = await razorpayClient.orders.create(options);
             console.log('Razorpay Order Created Successfully:', order);
             return res.json({ success: true, order });
         } catch (razorpayError) {
@@ -208,7 +236,8 @@ const verifyRazorpay = async (req, res) => {
         console.log('Received Signature:', razorpay_signature);
 
         // First fetch order details to get the original order_id (receipt)
-        const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id)
+        const razorpayClient = getRazorpayInstance()
+        const orderInfo = await razorpayClient.orders.fetch(razorpay_order_id)
         console.log('Order Info:', orderInfo);
         
         // Manual signature verification using Razorpay documentation approach
