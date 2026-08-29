@@ -1,5 +1,5 @@
-import React from 'react'
-import {Routes,Route} from 'react-router-dom'
+import React, { useContext, useEffect } from 'react'
+import {Routes,Route, useLocation} from 'react-router-dom'
 import Home from './pages/Home'
 import Collection from './pages/Collection'
 import About from './pages/About'
@@ -15,8 +15,21 @@ import SearchBar from './components/SearchBar'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Verify from './pages/Verify'
+import { ShopContext } from './context/ShopContext'
 
 const App = () => {
+  const location = useLocation()
+  const { token } = useContext(ShopContext)
+
+  useEffect(() => {
+    if (!token && ['/collection', '/cart', '/orders'].includes(location.pathname)) {
+      toast.info('Create an account or log in to access your profile and shop.', {
+        position: 'top-center',
+        autoClose: 3000,
+      })
+    }
+  }, [location.pathname, token])
+
   return (
     <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
       <ToastContainer />

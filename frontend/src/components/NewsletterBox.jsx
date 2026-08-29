@@ -8,7 +8,7 @@ const NewsletterBox = () => {
 
   return (
     <div className='text-center'>
-        <p className='text-2xl font-medium text-gray-800'>Subscribe now & get 30% off</p>
+        <p className='text-2xl font-medium text-gray-800'>Subscribe now & get 15% off</p>
         <p className='text-gray-400 mt-3'>
          Loren Ipsum is simply text of the printing and typesetting industry.
         </p>

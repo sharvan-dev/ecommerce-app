@@ -15,9 +15,9 @@ const Contact = () => {
           <img className='w-full md:max-w-[480px]' src={assets.contact_img} alt="" />
           <div className='flex flex-col justify-center items-start gap-6'>
             <p className='font-semibold text-xl text-gray-600'>Our Store</p>
-            <p className='text-gray-500'>221717 Sikandarpur Ballia <br /> Uttar Pradesh, INDIA, +91</p>
-            <p className='text-gray-500'>Tel: +91-8528145486 <br /> Email: webdeveloper5277@gmail.com</p>
-            <p className='font-semibold text-xl text-gray-600'>Careers at Forever</p>
+            <p className='text-gray-500'>497226 Bishrampur Surajpur <br /> Chhattisgharh, INDIA, +91</p>
+            <p className='text-gray-500'>Tel: +91-7800133604 <br /> Email: info.loomheritage.com@gmail.com</p>
+            <p className='font-semibold text-xl text-gray-600'>Careers at Loom Heritage</p>
             <p className='text-gray-500'>Learn more about our temes and job openings.</p>
             <button className='border border-black px-8 py-4 text-sm hover:bg-black hover:text-white transition-all duration-500'>Explore Jobs</button>
           </div>
