@@ -3,6 +3,8 @@ import {Routes,Route, useLocation} from 'react-router-dom'
 import Home from './pages/Home'
 import Collection from './pages/Collection'
 import About from './pages/About'
+import Blog from './pages/Blog'
+import MensDenim from './pages/MensDenim'
 import Contact from './pages/Contact'
 import Product from './pages/Product'
 import Cart from './pages/Cart'
@@ -15,6 +17,7 @@ import SearchBar from './components/SearchBar'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Verify from './pages/Verify'
+import TermsOfUse from './pages/TermsOfUse'
 import { ShopContext } from './context/ShopContext'
 
 const App = () => {
@@ -39,6 +42,8 @@ const App = () => {
         <Route path='/' element={<Home/>} />
         <Route path='/collection' element={<Collection/>} />
         <Route path='/about' element={<About/>} />
+        <Route path='/blog' element={<Blog/>} />
+        <Route path='/blog/mens-denim' element={<MensDenim/>} />
         <Route path='/contact' element={<Contact/>} />
         <Route path='/product/:productId' element={<Product/>} />
         <Route path='/cart' element={<Cart/>} />
@@ -46,6 +51,7 @@ const App = () => {
         <Route path='/place-order' element={<PlaceOrder/>} />
         <Route path='/orders' element={<Orders/>} />
         <Route path='/verify' element={<Verify/>} />
+        <Route path='/terms-of-use' element={<TermsOfUse/>} />
       </Routes>
       <Footer/>                         
     </div>

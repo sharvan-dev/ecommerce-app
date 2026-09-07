@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import {assets} from '../assets/assets'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -63,6 +63,17 @@ const Navbar = () => {
                 <hr className='w-2/4 borde-none h-[1.5px] bg-gray-700 hidden' />
 
             </NavLink>
+            <div className='group relative flex flex-col items-center gap-1'>
+                <NavLink to='/blog' className='flex flex-col items-center gap-1'>
+                    <p>BLOG</p>
+                    <hr className='w-2/4 borde-none h-[1.5px] bg-gray-700 hidden' />
+                </NavLink>
+                <div className='invisible absolute left-1/2 top-full z-10 w-48 -translate-x-1/2 pt-3 opacity-0 transition-all group-hover:visible group-hover:opacity-100'>
+                    <div className='border bg-white py-2 shadow-sm'>
+                        <Link to='/blog/mens-denim' className='block px-4 py-2 text-xs text-gray-600 hover:text-black'>LOOM HERITAGE MEN&apos;S DENIM</Link>
+                    </div>
+                </div>
+            </div>
             <NavLink to='/contact' className='flex flex-col items-center gap-1'>
                 <p>CONTACT</p>
                 <hr className='w-2/4 borde-none h-[1.5px] bg-gray-700 hidden' />
@@ -107,6 +118,8 @@ const Navbar = () => {
                 <NavLink onClick={()=>setVsible(false)} className='py-2 pl-6 border' to='/'>HOME</NavLink>
                 <NavLink onClick={()=>setVsible(false)} className='py-2 pl-6 border' to='/collection'>COLLECTION</NavLink>
                 <NavLink onClick={()=>setVsible(false)} className='py-2 pl-6 border' to='/about'>ABOUT</NavLink>
+                <NavLink onClick={()=>setVsible(false)} className='py-2 pl-6 border' to='/blog'>BLOG</NavLink>
+                <NavLink onClick={()=>setVsible(false)} className='border-b py-2 pl-10 text-sm' to='/blog/mens-denim'>LOOM HERITAGE MEN&apos;S DENIM</NavLink>
                 <NavLink onClick={()=>setVsible(false)} className='py-2 pl-6 border' to='/contact'>CONTACT</NavLink>
             </div>
         </div>

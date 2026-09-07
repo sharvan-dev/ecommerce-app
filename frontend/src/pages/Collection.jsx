@@ -55,7 +55,11 @@ const Collection = () => {
     }
 
     if (category.length > 0) {
-      productsCopy = productsCopy.filter(item => category.includes(item.category));
+      productsCopy = productsCopy.filter(item => category.some(selectedCategory =>
+        selectedCategory === 'Footwear'
+          ? item.category === 'Footwear' || item.subCategory === 'Footwear'
+          : item.category === selectedCategory
+      ));
     }
 
     if (subCategory.length > 0) {
@@ -134,6 +138,9 @@ const Collection = () => {
            </p>
            <p className='flex gap-2'>
             <input className='w-3' type="checkbox" value={'Winterwear'} onChange={toggleSubCategory} /> Winterwear
+           </p>
+           <p className='flex gap-2'>
+            <input className='w-3' type="checkbox" value={'Footwear'} checked={subCategory.includes('Footwear')} onChange={toggleSubCategory} /> Footwear
            </p>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React from 'react'
+import { Link } from 'react-router-dom'
 import { assets } from '../assets/assets'
 
 const Footer = () => {
@@ -9,16 +9,15 @@ const Footer = () => {
         <div>
             <img src={assets.logo} className='mb-4 h-10 w-auto max-w-[180px] object-contain' alt='Loom Heritage logo' />
             <p className='w-full md:w-2/3 text-gray-600'>
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown print took a galley of type and scrambled it to make a type specimen book.
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown print took a galley of type and scrambled it to make a type specimen book.
             </p>
         </div>
 
         <div>
           <p className='text-xl font-medium mb-5'>COMPANY</p>
           <ul className='flex flex-col gap-1 text-gray-600'>
-              <li>Home</li>
-              <li>About us</li>
-              <li>Delivery</li>
+              <li><Link to='/terms-of-use'>Terms of Use</Link></li>
+              <li>Returns</li>
               <li>Privacy policy</li>
           </ul>
         </div>  
@@ -26,8 +25,8 @@ const Footer = () => {
         <div>
           <p className='text-xl font-medium mb-5'>GET IN TOUCH</p>
           <ul className='flex flex-col gap-1 text-gray-600'>
-            <li>+91 7800133604</li>
-            <li>info.loomheritage.com@gmail.com</li>
+            <li><a href='tel:+917800133604' className='hover:text-black'>+91 7800133604</a></li>
+            <li><a href='mailto:info.loomheritage.com@gmail.com' className='hover:text-black'>info.loomheritage.com@gmail.com</a></li>
           </ul>
         </div>
 

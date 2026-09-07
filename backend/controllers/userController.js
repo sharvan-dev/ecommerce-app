@@ -85,15 +85,19 @@ const registerUser = async (req, res) => {
 const adminLogin = async (req, res) => {
    try {
     
-    const { email, password} = req.body
+    const email = req.body.email?.trim().toLowerCase()
+    const password = req.body.password?.trim()
 
+    if (email === process.env.ADD_ITEM_EMAIL?.trim().toLowerCase() && password === process.env.ADD_ITEM_PASSWORD?.trim()) {
+        const token = jwt.sign({ email, role: 'add-product' }, process.env.JWT_SECRET)
+        return res.json({ success: true, token, role: 'add-product' })
+    }
 
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-        // Sign a payload object for admin
-        const token = jwt.sign({ email, password }, process.env.JWT_SECRET);
-        res.json({ success: true, token });
+    if (email === process.env.ADMIN_EMAIL?.trim().toLowerCase() && password === process.env.ADMIN_PASSWORD?.trim()) {
+        const token = jwt.sign({ email, role: 'admin' }, process.env.JWT_SECRET)
+        return res.json({ success: true, token, role: 'admin' })
     } else {
-        res.json({ success: false, message: "Invalid credentials" });
+        return res.json({ success: false, message: "Invalid credentials" });
     }
 
    } catch (error) {

@@ -10,22 +10,22 @@ import { assets } from '../assets/assets'
 const categoryCards = [
   {
     name: 'Men',
-    image: assets.p_img1,
+    image: assets.men_dp,
     to: '/collection?category=Men'
   },
   {
     name: 'Women',
-    image: assets.p_img48,
+    image: assets.woman_dp,
     to: '/collection?category=Women'
   },
   {
     name: 'Kids',
-    image: assets.p_img3,
+    image: assets.kids_dp,
     to: '/collection?category=Kids'
   },
   {
     name: 'Footwear',
-    image: assets.p_img50,
+    image: assets.footwear_dp,
     to: '/collection?category=Footwear'
   }
 ]

@@ -4,6 +4,9 @@ import axios from 'axios'
 import { backendUrl } from '../App'
 import { toast } from 'react-toastify'
 
+const apparelSizes = ['S', 'M', 'L', 'XL', 'XXL']
+const footwearSizes = ['3', '4', '5', '6', '7', '8', '9', '10']
+
 const Add = ({token}) => {
 
   const[image1,setImage1] = useState(false)
@@ -18,6 +21,7 @@ const Add = ({token}) => {
   const [price, setPrice] = useState("");
   const [sizes, setSizes] = useState([]);
   const [bestseller, setBestseller] = useState(false);
+  const sizeOptions = subcategory === 'Footwear' ? footwearSizes : apparelSizes;
 
   const onSumitHandler = async (e) =>{
    e.preventDefault();
@@ -100,14 +104,23 @@ const Add = ({token}) => {
             <option value="Men">Men</option>
             <option value="Women">Women</option>
             <option value="Kids">Kids</option>
+            <option value="Footwear">Footwear</option>
           </select>
         </div>
         <div>
           <p className='mb-2'>Sub category</p>
-          <select onChange={(e) => setSubcategory(e.target.value)} className='w-full px-3 py-1'>
+          <select
+            onChange={(e) => {
+              setSubcategory(e.target.value);
+              setSizes([]);
+            }}
+            value={subcategory}
+            className='w-full px-3 py-1'
+          >
             <option value="Topwear">Topwear</option>
             <option value="Bottomwear">Bottomwear</option>
             <option value="Winterwear">Winterwear</option>
+            <option value="Footwear">Footwear</option>
           </select>
         </div>
 
@@ -121,25 +134,16 @@ const Add = ({token}) => {
       <div>
         <p className='mb-2'>Product Sizes</p>
         <div className='flex gap-3'>
-          <div onClick={() => setSizes(prev => prev.includes("S") ? prev.filter( item => item !== "S") : [...prev, "S"])}>
-            <p className={` ${sizes.includes("S") ? "bg-pink-100" : "bg-slate-200" } px-3 py cursor-pointer`}>S</p>
-          </div>
-
-          <div  onClick={() => setSizes(prev => prev.includes("M") ? prev.filter( item => item !== "M") : [...prev, "M"])}>
-            <p className={` ${sizes.includes("M") ? "bg-pink-100" : "bg-slate-200" } px-3 py cursor-pointer`}>M</p>
-          </div>
-
-          <div onClick={() => setSizes(prev => prev.includes("L") ? prev.filter( item => item !== "L") : [...prev, "L"])}>
-            <p className={` ${sizes.includes("L") ? "bg-pink-100" : "bg-slate-200" } px-3 py cursor-pointer`}>L</p>
-          </div>
-
-          <div onClick={() => setSizes(prev => prev.includes("XL") ? prev.filter( item => item !== "XL") : [...prev, "XL"])}>
-            <p className={` ${sizes.includes("XL") ? "bg-pink-100" : "bg-slate-200" } px-3 py cursor-pointer`}>XL</p>
+          {sizeOptions.map((size) => (
+            <div
+              key={size}
+              onClick={() => setSizes(prev => prev.includes(size) ? prev.filter(item => item !== size) : [...prev, size])}
+            >
+              <p className={` ${sizes.includes(size) ? "bg-pink-100" : "bg-slate-200" } px-3 py cursor-pointer`}>
+                {subcategory === 'Footwear' ? `${size}"` : size}
+              </p>
             </div>
-
-          <div onClick={() => setSizes(prev => prev.includes("XXL") ? prev.filter( item => item !== "XXL") : [...prev, "XXL"])}>
-            <p className={` ${sizes.includes("XXL") ? "bg-pink-100" : "bg-slate-200" } px-3 py cursor-pointer`}>XXL</p>            
-          </div>
+          ))}
         </div>
       </div>
 

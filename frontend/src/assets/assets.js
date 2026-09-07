@@ -55,8 +55,16 @@ import p_img51 from './p_img51.png'
 import p_img52 from './p_img52.png'
 
 
+
+
 import logo from './logo.png'
 import hero_img from './hero_img.png'
+import hero_banner_1 from './hero_banner_1.png'
+import hero_banner_2 from './hero_banner_2.png'
+import hero_banner_3 from './hero_banner_3.png'
+import hero_banner_4 from './hero_banner_4.png'
+import hero_banner_5 from './hero_banner_5.png'
+import hero_banner_6 from './hero_banner_6.png'
 import cart_icon from './cart_icon.png'
 import bin_icon from './bin_icon.png'
 import dropdown_icon from './dropdown_icon.png'
@@ -73,10 +81,15 @@ import contact_img from './contact_img.png'
 import razorpay_logo from './razorpay_logo.png'
 import stripe_logo from './stripe_logo.png'
 import cross_icon from './cross_icon.png'
+import men_dp from  './men_dp.png'
+import woman_dp from './woman_dp.png'
+import kids_dp from './kids_dp.png'
+import footwear_dp from './footwear_dp.png'
 
 export const assets = {
     logo,
     hero_img,
+    hero_banners: [hero_banner_1, hero_banner_2, hero_banner_3, hero_banner_4, hero_banner_5, hero_banner_6],
     cart_icon,
     dropdown_icon,
     exchange_icon,
@@ -92,7 +105,12 @@ export const assets = {
     contact_img,
     razorpay_logo,
     stripe_logo,
-    cross_icon
+    cross_icon,
+    men_dp,
+    woman_dp,
+    kids_dp,
+    footwear_dp,
+
 }
 
 export const products = [

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
 import { Routes, Route } from 'react-router-dom'
@@ -12,24 +12,41 @@ import 'react-toastify/dist/ReactToastify.css';
 export const backendUrl = import.meta.env.VITE_BACKEND_URL
 export const currency = '₹'
 
+const getTokenRole = (token) => {
+  try {
+    return JSON.parse(atob(token.split('.')[1])).role
+  } catch {
+    return ''
+  }
+}
+
 const App = () => {
   const [token, setToken] = useState('');
+  const [role, setRole] = useState('');
 
   useEffect(() => {
     // Try to get token from sessionStorage instead of localStorage
     const savedToken = sessionStorage.getItem('adminToken');
-    if (savedToken) {
+    const savedRole = getTokenRole(savedToken) || sessionStorage.getItem('adminRole');
+    if (savedToken && savedRole) {
       setToken(savedToken);
+      setRole(savedRole);
+    } else {
+      sessionStorage.removeItem('adminToken');
+      sessionStorage.removeItem('adminRole');
     }
   }, []);
 
-  const handleSetToken = (newToken) => {
+  const handleSetToken = (newToken, newRole = '') => {
     if (newToken) {
       sessionStorage.setItem('adminToken', newToken);
+      sessionStorage.setItem('adminRole', newRole || getTokenRole(newToken));
     } else {
       sessionStorage.removeItem('adminToken');
+      sessionStorage.removeItem('adminRole');
     }
     setToken(newToken);
+    setRole(newRole || getTokenRole(newToken));
   };
   
   return (
@@ -41,12 +58,12 @@ const App = () => {
           <Navbar setToken={handleSetToken} />
           <hr />
           <div className='flex w-full'>
-            <Sidebar />
+            <Sidebar role={role} />
             <div className='w-[70%] mx-auto ml-[max(5vw,25px)] my text-gray-600 text-base'>
               <Routes>
                 <Route path='/add' element={<Add token={token} />} />
-                <Route path='/list' element={<List token={token} />} />
-                <Route path='/orders' element={<Orders token={token} />} />
+                {role === 'admin' && <Route path='/list' element={<List token={token} />} />}
+                {role === 'admin' && <Route path='/orders' element={<Orders token={token} />} />}
               </Routes>
             </div>
           </div>
