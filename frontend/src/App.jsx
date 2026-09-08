@@ -18,6 +18,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Verify from './pages/Verify'
 import TermsOfUse from './pages/TermsOfUse'
+import ReturnPolicy from './pages/ReturnPolicy'
 import { ShopContext } from './context/ShopContext'
 
 const App = () => {
@@ -25,6 +26,8 @@ const App = () => {
   const { token } = useContext(ShopContext)
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+
     if (!token && ['/collection', '/cart', '/orders'].includes(location.pathname)) {
       toast.info('Create an account or log in to access your profile and shop.', {
         position: 'top-center',
@@ -52,6 +55,7 @@ const App = () => {
         <Route path='/orders' element={<Orders/>} />
         <Route path='/verify' element={<Verify/>} />
         <Route path='/terms-of-use' element={<TermsOfUse/>} />
+        <Route path='/return-policy' element={<ReturnPolicy/>} />
       </Routes>
       <Footer/>                         
     </div>

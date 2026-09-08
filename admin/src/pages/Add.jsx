@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { assets } from '../assets/assets'
 import axios from 'axios'
 import { backendUrl } from '../App'
@@ -21,12 +21,31 @@ const Add = ({token}) => {
   const [price, setPrice] = useState("");
   const [sizes, setSizes] = useState([]);
   const [bestseller, setBestseller] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const imageInputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
   const sizeOptions = subcategory === 'Footwear' ? footwearSizes : apparelSizes;
 
   const onSumitHandler = async (e) =>{
    e.preventDefault();
 
-   try {
+    if (!price || Number(price) <= 0) {
+     toast.error('Enter a valid product price');
+     return;
+    }
+
+    if (sizes.length === 0) {
+     toast.error('Select at least one product size');
+     return;
+    }
+
+    if (!image1) {
+     toast.error('Upload at least one product image');
+     return;
+    }
+
+  setIsSubmitting(true);
+
+  try {
 
     const formData = new FormData()
 
@@ -46,19 +65,27 @@ const Add = ({token}) => {
     const response = await axios.post(backendUrl + "/api/product/add", formData, { headers:{ token }})
 
     if (response.data.success) {
-      toast.success('response.data.message');
+      toast.success('Item added successfully');
       setNmae('');
       setDescription('');
+      setPrice('');
+      setSizes([]);
+      setBestseller(false);
       setImage1(false);
       setImage2(false);
       setImage3(false);
       setImage4(false);
+      imageInputRefs.forEach((inputRef) => {
+        if (inputRef.current) inputRef.current.value = '';
+      });
     } else {
-      toast.error(response.data.message);
+      toast.error(response.data.message || 'Unable to add item');
     }
    } catch (error) {
     console.error(error);
-    toast.error(error.message);
+    toast.error(error.response?.data?.message || error.message || 'Unable to add item');
+   } finally {
+    setIsSubmitting(false);
    }
   }
 
@@ -70,19 +97,19 @@ const Add = ({token}) => {
         <div className='flex gap-2'>
           <label htmlFor="image1">
             <img className='w-20' src={!image1 ? assets.upload_area : URL.createObjectURL(image1)} alt="" />
-            <input onChange={(e=>setImage1 (e.target.files[0]))} type="file" id="image1" hidden/>
+            <input ref={imageInputRefs[0]} onChange={(e=>setImage1(e.target.files[0]))} type="file" id="image1" hidden/>
           </label>
           <label htmlFor="image2">
             <img className='w-20' src={!image2 ? assets.upload_area : URL.createObjectURL(image2)} alt="" />
-            <input onChange={(e=>setImage2 (e.target.files[0]))} type="file" id="image2" hidden/>
+            <input ref={imageInputRefs[1]} onChange={(e=>setImage2(e.target.files[0]))} type="file" id="image2" hidden/>
           </label>
           <label htmlFor="image3">
             <img className='w-20' src={!image3 ? assets.upload_area : URL.createObjectURL(image3)} alt="" />
-            <input onChange={(e=>setImage3 (e.target.files[0]))} type="file" id="image3" hidden/>
+            <input ref={imageInputRefs[2]} onChange={(e=>setImage3(e.target.files[0]))} type="file" id="image3" hidden/>
           </label>
           <label htmlFor="image4">
             <img className='w-20' src={!image4 ? assets.upload_area : URL.createObjectURL(image4)} alt="" />
-            <input onChange={(e=>setImage4 (e.target.files[0]))} type="file" id="image4" hidden/>
+            <input ref={imageInputRefs[3]} onChange={(e=>setImage4(e.target.files[0]))} type="file" id="image4" hidden/>
           </label>
         </div>
       </div>
@@ -104,7 +131,6 @@ const Add = ({token}) => {
             <option value="Men">Men</option>
             <option value="Women">Women</option>
             <option value="Kids">Kids</option>
-            <option value="Footwear">Footwear</option>
           </select>
         </div>
         <div>
@@ -152,7 +178,9 @@ const Add = ({token}) => {
         <label className='cursor-pointer' htmlFor="bestseller">Add to bestseller</label>
       </div>
 
-      <button type='submit' className='w-28 py-3 mt-4 bg-black text-white'>ADD</button>
+      <button disabled={isSubmitting} type='submit' className='w-28 py-3 mt-4 bg-black text-white disabled:opacity-50'>
+        {isSubmitting ? 'ADDING...' : 'ADD'}
+      </button>
       
     </form>
   )

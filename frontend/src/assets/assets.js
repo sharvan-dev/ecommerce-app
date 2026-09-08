@@ -65,6 +65,8 @@ import hero_banner_3 from './hero_banner_3.png'
 import hero_banner_4 from './hero_banner_4.png'
 import hero_banner_5 from './hero_banner_5.png'
 import hero_banner_6 from './hero_banner_6.png'
+import hero_banner_7 from './hero_banner_7.png'
+import hero_banner_8 from './hero_banner_8.png'
 import cart_icon from './cart_icon.png'
 import bin_icon from './bin_icon.png'
 import dropdown_icon from './dropdown_icon.png'
@@ -89,7 +91,7 @@ import footwear_dp from './footwear_dp.png'
 export const assets = {
     logo,
     hero_img,
-    hero_banners: [hero_banner_1, hero_banner_2, hero_banner_3, hero_banner_4, hero_banner_5, hero_banner_6],
+    hero_banners: [hero_banner_1, hero_banner_2, hero_banner_3, hero_banner_4, hero_banner_5, hero_banner_6, hero_banner_7, hero_banner_8],
     cart_icon,
     dropdown_icon,
     exchange_icon,
@@ -106,6 +108,8 @@ export const assets = {
     razorpay_logo,
     stripe_logo,
     cross_icon,
+
+    
     men_dp,
     woman_dp,
     kids_dp,

@@ -9,24 +9,51 @@ const Product = () => {
   const { productId } = useParams();
   const { products, currency , addToCart } = useContext(ShopContext);
   const [productData, setProductData] = useState(false);
-  const [image, setImage] = useState('')
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [touchStartX, setTouchStartX] = useState(null)
   const [size,setSize] = useState('')
 
-  const fetchProductData = async () => {
+  useEffect(() => {
+    const product = products.find((item) => item._id === productId)
 
-    products.map((item) => {
-      if (item._id == productId) {
-        setProductData(item)
-        setImage(item.image[0])
-        return null;
-      }
-    })
-
-  }
+    setProductData(product || false)
+    setActiveImageIndex(0)
+    setSize('')
+  }, [productId, products])
 
   useEffect(() => {
-    fetchProductData();
-  }, [productId])
+    if (!productData || productData.image.length < 2) return undefined
+
+    const slider = window.setInterval(() => {
+      setActiveImageIndex((currentIndex) => (currentIndex + 1) % productData.image.length)
+    }, 4000)
+
+    return () => window.clearInterval(slider)
+  }, [productData])
+
+  const showPreviousImage = () => {
+    setActiveImageIndex((currentIndex) => (
+      currentIndex === 0 ? productData.image.length - 1 : currentIndex - 1
+    ))
+  }
+
+  const showNextImage = () => {
+    setActiveImageIndex((currentIndex) => (currentIndex + 1) % productData.image.length)
+  }
+
+  const handleTouchStart = (event) => {
+    setTouchStartX(event.touches[0].clientX)
+  }
+
+  const handleTouchEnd = (event) => {
+    if (touchStartX === null) return
+
+    const swipeDistance = event.changedTouches[0].clientX - touchStartX
+    if (Math.abs(swipeDistance) > 40) {
+      swipeDistance > 0 ? showPreviousImage() : showNextImage()
+    }
+    setTouchStartX(null)
+  }
 
   return productData ? (
     <div className='border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100'>
@@ -35,15 +62,67 @@ const Product = () => {
 
         {/* -------- Product Images ----------- */}
         <div className='flex-1 flex flex-col-col-reverse gap-3 sm:flex-row'>
-          <div className='flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-betweem sm:justify-normal sm:w-[18.7%] w-full'>
+          <div className='hidden sm:flex sm:flex-col overflow-y-scroll justify-normal sm:w-[18.7%]'>
              {
               productData.image.map((item,index)=>(
-                <img onClick={()=>setImage(item)} src={item} key={index} className='w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer' alt="" />
+                <button
+                  onClick={() => setActiveImageIndex(index)}
+                  className={`sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer ${activeImageIndex === index ? 'ring-1 ring-black' : ''}`}
+                  key={item}
+                  type='button'
+                >
+                  <img src={item} className='w-full' alt={`${productData.name} view ${index + 1}`} />
+                </button>
               ))
              }
           </div>
-          <div className='w-full sm:w-[80%]'>
-              <img className='w-full h-auto' src={image} alt="" />
+          <div className='hidden sm:block w-full sm:w-[80%]'>
+              <img className='w-full h-auto' src={productData.image[activeImageIndex]} alt={productData.name} />
+          </div>
+
+          <div
+            className='sm:hidden w-full'
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div className='relative aspect-[4/5] w-full overflow-hidden bg-gray-100'>
+              <img
+                className='h-full w-full object-cover'
+                src={productData.image[activeImageIndex]}
+                alt={`${productData.name} view ${activeImageIndex + 1}`}
+              />
+              {productData.image.length > 1 && (
+                <>
+                  <button
+                    type='button'
+                    onClick={showPreviousImage}
+                    className='absolute left-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-xl text-gray-700 shadow'
+                    aria-label='Previous product image'
+                  >
+                    &#8249;
+                  </button>
+                  <button
+                    type='button'
+                    onClick={showNextImage}
+                    className='absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-xl text-gray-700 shadow'
+                    aria-label='Next product image'
+                  >
+                    &#8250;
+                  </button>
+                </>
+              )}
+            </div>
+            <div className='flex justify-center gap-2 py-4'>
+              {productData.image.map((item, index) => (
+                <button
+                  type='button'
+                  key={item}
+                  onClick={() => setActiveImageIndex(index)}
+                  className={`h-2 w-2 rounded-full transition-colors ${activeImageIndex === index ? 'bg-gray-800' : 'bg-gray-300'}`}
+                  aria-label={`View product image ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
@@ -92,7 +171,11 @@ const Product = () => {
 
       {/* ----------- display related products-------------- */}
 
-      <RelatedProducts category={productData.category} subCategory={productData.subCategory} />
+      <RelatedProducts
+        productId={productData._id}
+        category={productData.category}
+        subCategory={productData.subCategory}
+      />
 
     </div>
   ) : <div className='opacity-0'></div>
